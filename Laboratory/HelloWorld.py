@@ -7,7 +7,7 @@ Date of creation: 24 August 2019
 Description:
     First script in Python. Printing "Hello World". 
     Includes definition of a function and calling it.
-    Includes experiments with user input, 
+    Includes experiments with user input and basic error handling, 
     various variable types and simple algebra. 
     
 
@@ -28,29 +28,67 @@ def cohle():
 # function ends when indentation is stopped
 
 cohle()
-###################################
-### simple algebric calculations
+##########################################################
+##### simple algebric calculations #######################
+##########################################################
 
 import math
 
-print ("To solve the quadratic eqn: ax^2 + bx + c = 0:")
+print ("To solve the quadratic eqn: ax^2 + bx + c = 0. a, b, c should have integer values.")
 
-a = input("Enter the value of a:")
-b = input("Enter the value of b:")
-c = input("Enter the value of c:")
- 
-D = b**2 - 4*a*c #problem with this statement
+########################################
+##### with simple error handling #######
+########################################
 
-if D <0:
+S = 1
 
-    print ("This equation has no solutions")
+try:
+
+    a = int(input("Enter the value of a:"))
+except ValueError:
+    S = 0;
+    print("Invalid input")
+
+try:
+
+    b = int(input("Enter the value of b:"))
+except ValueError:
+    S = 0;
+    print("Invalid input")
     
-else:    
-    x1 = (-b - math.sqrt(D)) / (2*a)
-    x2 = (-b + math.sqrt(D)) / (2*a)
+try:
+
+    c = int(input("Enter the value of c:"))
+except ValueError:
+    S = 0;
+    print("Invalid input")    
+
+
+if S==0:
+    print ("At least one of the user input is invalid")
+else:
+########################################
+##### without simple error handling #######
+########################################
     
-    print ("x1 = "),x1
-    print ("x2 = "),x2
+    
+#a = int(input("Enter the value of a:"))
+#b = int(input("Enter the value of b:"))
+#c = int(input("Enter the value of c:"))
+       
+    D = b**2 - 4*a*c 
+    
+    if D <0:
+    
+        print ("This equation has no solutions")
+        
+    else:    
+        x1 = (-b - math.sqrt(D)) / (2*a)
+        x2 = (-b + math.sqrt(D)) / (2*a)
+        
+        print("The solution to above quadractic equation is:")
+        print ("x1 = ",x1)
+        print ("x2 = ",x2)
 
 
 
