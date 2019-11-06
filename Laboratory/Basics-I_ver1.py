@@ -2,27 +2,20 @@
 """
 Code by: Palash Patole
 MoMpy Project: Laboratory
-Date of creation: Tue Oct 29 20:43:25 2019
+Date of creation: Tue Nov  5 21:21:57 2019
 
-Version: Base
+Version: 1
 
 Description:
     Solving BASICS-I assignment of MGOD course 
-    1. Conversion from Kepler Elements to Cartesian coordinates
+    1. Conversion from Kepler Elements to Cartesian coordinates 
+            - through a function
     2. Conversion from Cartesian coordinates to Kepler elements
-    3. Verified through by converting Cartesian coordinates of the ISS 
-       at a given epoch into Kepler elements and vice-versa
-    4. Verified through by converting Cartesian coordinates of the Cryosat-2 
-       at a given epoch into Kepler elements and vice-versa
-    5. Verified through by converting Cartesian coordinates of the Problem I
-       into Kepler elements
-    6. Verified through by converting Kepler elements of the Problem II
-       into Cartesian coordinates
+        - through a function
        
     In follow-ups:
-    1. Develop functions for coordinate conversions
-    2. Extract mu from SPICE Kernels
-    3. Generilse the functions as part of a module, called from another file. 
+    1.Extract mu from SPICE Kernels
+    2. Generilse the functions as part of a module, called from another file. 
        Extract mu in this file and pass it to the class.
     
 
@@ -191,3 +184,86 @@ print ("X-velocity [m/s]: x_dot = ", x_dot)
 print ("Y-velocity [m/s]: y_dot = ", y_dot)
 print ("Z-velocity [m/s]: z_dot = ", z_dot) 
 ####################################################
+
+def convertCartesianToKepler(S_bar,mu,isOutputInDegree = False,isPrint=False):
+    """Converts cartesian coordinates into equivalent Kepler elements."""
+    print("C2K called. S_bar[0] is",S_bar[0])
+    
+    ####################################################
+    ######### Cartesian to Kepler Conversion ###########
+    ####################################################
+    ## 1. Computation of required Vectors and their norms
+    r_bar = S_bar[:3] # position vector [m]
+    V_bar = S_bar[3:6] # velocity vector [m/s]
+        
+    h_bar = np.cross(r_bar,V_bar) # angular momentum vector
+    h = np.linalg.norm(h_bar) # magnitude of angular momentum vector
+    r = np.linalg.norm(r_bar) # magnitude of position vector [m]
+    V = np.linalg.norm(V_bar) # magnitude of velocity vector [m/s]
+
+    N_bar = np.cross(np.array([0,0,1]),h_bar) # N vector
+    Nxy = np.linalg.norm(N_bar) # squareroot of N_bar(1,1)^2 + N_bar(2,1)^2;
+    e_bar = np.cross(V_bar,h_bar)/mu - r_bar/r # eccentricity vector
+
+
+    ## 2. Computation of orbital elements
+    a = 1/(2/r - V**2/mu) # Semi-major axis [m]
+    e = np.linalg.norm(e_bar) # Eccentricity
+    i = math.acos(h_bar[2]/h) # Inclination [radian]
+    RAAN = math.atan2(N_bar[1]/Nxy,N_bar[0]/Nxy) # RAAN [radian]
+
+    ## 3. Settting up the sign for argument of peri-center
+    if np.dot(np.cross(N_bar,e_bar),h_bar) > 0:
+        sign1 = 1
+    else:
+        sign1 = -1
+        
+    ## 4. Setting up the sign for true anomaly 
+    if np.dot(np.cross(e_bar,r_bar),h_bar) > 0:
+        sign2 = 1
+    else:
+        sign2 = -1
+        
+    ## 5. Computation of orbital elements - continued
+    omega = sign1 * math.acos(np.dot((e_bar/e),(N_bar/Nxy))) # Argument of periapsis [radian]   
+    theta = sign2 * math.acos(np.dot((r_bar/r),(e_bar/e))) # True anomaly [radian]
+
+
+    ## 6. Computation of mean and eccentric anomalies
+    E = 0
+    M = 0
+    if e > 0 and e < 1:
+        E = 2 * math.atan(math.tan(theta/2)*math.sqrt( (1-e) / (1+e) )) # Eccentric anomaly [radian]
+        M = E - e * math.sin(E) # Mean anomaly [radian]
+    
+    ## 7. Correcting for negative values of angles if any   
+    if RAAN < 0:
+        RAAN = RAAN + 2 * math.pi
+    if omega < 0:
+        omega = omega + 2 * math.pi
+    if theta < 0:    
+        theta = theta+ 2 * math.pi
+    if E < 0:
+        E = E + 2 * math.pi
+    if M < 0:
+        M = M + 2 * math.pi
+    
+    ## 8. Displaying results
+    print("Conversion from cartesian coordinates to Kepler elements is successful.")
+    print ("Converted Kepler elements are:")    
+    print ("Semi-major axis [m]: a = ",a)
+    print ("Eccentricity: e = ",e)
+    print ("Inclination [deg]: i = ",i*r2d)
+    print ("RAAN [deg]: \u03A9 = ",RAAN*r2d)
+    print ("Argument of periapsis [deg]: \u03C9 = ",omega*r2d)
+    print ("True anomaly [deg]: \u03B8 = ",theta*r2d)
+    print ("Eccentric anomaly [deg]: E = ",E*r2d)
+    print ("Mean anomaly [deg]: M = ",M*r2d)
+    if  isPrint == True:
+        print("Printing is to be used")
+    
+    return S_bar[2]    
+        
+    
+
+temp = convertCartesianToKepler(S_bar,mu)    # Position arguments are passed
