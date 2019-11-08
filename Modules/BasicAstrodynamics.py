@@ -2,31 +2,18 @@
 """
 Code by: Palash Patole
 MoMpy Project: Laboratory
-Date of creation: Tue Nov  5 21:21:57 2019
+Date of creation: Fri Nov  8 20:50:04 2019
 
-Version: 1
+version: Base
 
-Description:
-    Solving BASICS-I assignment of MGOD course 
-    1. Conversion from Kepler Elements to Cartesian coordinates 
-            - through a function
-    2. Conversion from Cartesian coordinates to Kepler elements
-        - through a function
-       
-    In follow-ups:
-    1. Generilse the functions as part of a module, called from another file. 
-       Extract mu (manually/SPICE) in this file and pass it to the function.
-    2. Use switch cases to decide what kind of anomaly is used when Kepler to Cartesian.
-
-    
-
+Culmination of:
+    1. Ver2 of Basics-I_ver1.py - 
+       functions for Converting from/to Cartesian coordinates to /from Kepler elements
+       Added on: Nov 8
 """
+
 import math # to use value of Pi
 import numpy as np #NumPy library
-
-
-
-
 
 def convertCartesianToKepler(S_bar,mu,isOutputInDegree = False,isPrint=False):
     """Converts cartesian coordinates into equivalent Kepler elements."""
@@ -219,63 +206,3 @@ def convertKeplerToCartesian(KeplerElements,mu,typeOfAnomaly =1,isInputInDegree 
         print ("Z-velocity [m/s]: z_dot = \t", z_dot) 
     
     return Cartesian
-
-
-#########################################################
-############    Testing the functions locally ###########
-#########################################################
-    
-# State vector in cartesian coordinates:
-## Part(Problem) 1 of Basics-I assignment 
-#S_bar = np.array([8751268.4691, -7041314.6869, 4846546.9938, 332.2601039, -2977.0815768, -4869.8462227]) 
-
-## ISS coordinates on June 12,2014 12:00:00 hrs 
-#S_bar = np.array([-2700816.14,-3314092.80, 5266346.42, 5168.606550, -5597.546618, -868.878445]) 
-
-# Cryosat-2 coordinates on June 13,2014 14:59:21 hrs
-S_bar = np.array([3126974.99, -6374445.74, 28673.59, -254.91197, -83.30107, 7485.70674]) 
-
-mu = 398600.441E9 # Gravitational parameter for Earth [m^3/s^2]
-    
-# State vector in Kepler elements   
-# Part(Problem) 2 of Basics-I assignment 
-a = 12158817.9615 # Semi-major axis[m]
-e = 0.014074320051 # Eccentricity
-i = 52.666016957 # Inclination [deg]
-RAAN = 323.089150643 # Right ascention of ascending node [deg]
-omega = 148.382589129 # Argument of pericenter [deg]
-M = 112.192638384 # Mean anomaly[deg] 
-
-## ISS coordinates on June 12,2014 12:00:00 hrs 
-#a = 6787746.891  # Semi-major axis[m]
-#e = 0.000731104 # Eccentricity
-#i = 51.68714486 # Inclination [deg]
-#RAAN = 127.5486706 # Right ascention of ascending node [deg]
-#omega = 74.21987137 # Argument of pericenter [deg]
-#M = 24.06608426 # Mean anomaly[deg] 
-#theta = 24.10027677 # True anomaly [deg]
-#E = 24.08317766 # Eccentric anomaly [deg]
-
-## Cryosat-2 coordinates on June 13,2014 14:59:21 hrs
-#a = 7096137  # Semi-major axis[m]
-#e = 0.0011219 # Eccentricity
-#i = 92.0316 # Inclination [deg]
-#RAAN = 296.1384 # Right ascention of ascending node [deg]
-#omega = 120.6878 # Argument of pericenter [deg]
-#M = 239.6546 # Mean anomaly[deg]   
-#theta = 239.5437 # True Anomaly [deg]  
-#E = 239.5991 # Eccentric Anomaly [deg]
-
-Kepler = np.array([a,e,i,RAAN,omega,M])
-Kepler2 = np.array([a,e,i,RAAN,omega,theta])
-Kepler3 = np.array([a,e,i,RAAN,omega,E])
-
-CovertedKep = convertCartesianToKepler(S_bar,mu,True,True)    # Position arguments are passed
-
-#ConvertedCarte = convertKeplerToCartesian(Kepler,mu,1,isInputInDegree = True, isPrint=True)
-
-#ConvertedCarte4 = convertKeplerToCartesian(Kepler2,mu,3,isInputInDegree = True, isPrint=True)
-
-#ConvertedCarte2 = convertKeplerToCartesian(Kepler3,mu,typeOfAnomaly =2,isInputInDegree = True, isPrint=True)
-
-ConvertedCarte = convertKeplerToCartesian(Kepler,mu,6,isInputInDegree = True, isPrint=True)
