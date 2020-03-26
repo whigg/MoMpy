@@ -3,7 +3,7 @@
 
 Code by: Palash Patole
 MoMpy Project: Laboratory
-Date of creation: Sat Mar  7 14:42:52 2020
+Date of creation: Sat Mar  7 14:42:52 2020 
 
 version: Base
 
@@ -24,7 +24,7 @@ import sys
 
 spice.furnsh("./External_files/Spice_kernels/kernel_load.txt")
 
-Question = 3 # 1 - Question 1, 2 - Question 2A, 3 - Question 2B, 
+Question = 2 # 1 - Question 1, 2 - Question 2A, 3 - Question 2B, 
            
 
 if Question ==1:
@@ -105,7 +105,7 @@ if Question ==1:
     print('Corrosponding periods are:',T_store)
 
 elif Question ==2 or Question == 3 or Question == 4:
-############ Question 2, solved using approach 1 (Q2A)
+############ Question 2, solved using approach 1 (Q2A) or 2 (Q2B)
     ## input parameters
     e = 0
     De = 86164.1004 # s, to be extracted from spice
