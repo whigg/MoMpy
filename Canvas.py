@@ -31,7 +31,7 @@ S_bar = np.array([8751268.4691, -7041314.6869, 4846546.9938, 332.2601039, -2977.
 
 
 # Extracting mu from SPICE kernels
-print (spiceypy.tkvrsn('TOOLKIT'))
+print (spice.tkvrsn('TOOLKIT'))
 
 spice.furnsh("./External_files/Spice_kernels/kernel_load.txt")
 

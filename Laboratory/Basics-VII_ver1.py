@@ -35,6 +35,8 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
     Result = 0
     Nsolutions = 0
     
+    print
+    
     # Error handling
     jkSize = jk.shape
     if (int(jkSize[1])!=2):
