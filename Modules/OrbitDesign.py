@@ -1,34 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-: Sat Mar 25 2020, ‏‎08:30:56
+Code by: Palash Patole
+MoMpy Project: Modules
+Date of creation: Fri Mar 27 2020, 07:46:28 
 
-version: Version 1
+version: Base
 
-Description:
-    1. Developed a function to compute Earth repeat orbits geometry when
-        a or i, j, k, e are provided as inputs
-    2. Low fidelity approach (default) where Earth-repeat orbit solutions are 
-        computed cosindering the effect of $J_2$ perturbation on $\Omega$ only  
-    3. High fidelity approach where Earth-repeat orbit solutions are 
-        computed cosindering the effect of $J_2$ perturbation on $\Omega$, 
-        $\omega$, and $M$ 
-    4. Either altitude or inclination values (minimum,maximum,step size) are 
-        to be provided.
-    5. Low fidelity approach does not work when the inclination is known 
-        while altitude is unknown
-    6. For eccentric orbits, altitude values (input and output) should 
-        corrospond to the perigee altitude.        
-        
+Culmination of:
+    1. Ver2 of Basics-VII_ver1.py - 
+       functions for finding Earth-repeat orbit solutions
+       Added on: March 27, 2020
 """
-
-import numpy as np2
 
 def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=False):
     # importing the required modules
     import spiceypy as spice
     import math
     import numpy as np
-    import sys
     
     Result = 0
     Nsolutions = 0
@@ -51,11 +39,11 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
     # Extracting the parameters
     spice.furnsh("./External_files/Spice_kernels/kernel_load.txt")
     muE = spice.bodvrd('Earth','GM',1)
-    mu = muE[1][0] #km3/s2 for earth 
-    J2 = 1082.63E-6 #J2 for earth - import from spice
+    mu = muE[1][0] # [km3/s2] for earth 
+    J2 = 1082.63E-6 #J2 for earth
     RE = spice.bodvrd('EARTH','RADII',3)
-    Re= RE[1][0]
-    De = 86164.1004 # s, Sidereal day, to be extracted from spice
+    Re= RE[1][0] # [km], Average radius of Earth 
+    De = 86164.1004 # [s], Sidereal day
     k2 = 0.75 * J2 * math.sqrt(mu)* Re*Re
     r2d = 1/spice.rpd() # Radian to degree conversion
     
@@ -65,9 +53,9 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
     Result.shape= [int(jkSize[0]),int(steps),6]
     
     # Computations
-    for count in range(0,jkSize[0]):
-#        print(count)
-        for rowCount in range(0,int(steps)):
+    for count in range(0,jkSize[0]): #looping over j and k values
+        
+        for rowCount in range(0,int(steps)): #looping over variable values
             j = jk[count,0]    
             k = jk[count,1]    
             
@@ -82,17 +70,8 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
             Result[count,rowCount,4] = math.nan # to be computed 
             Result[count,rowCount,5] = math.nan # to be computed
             
-            # computations
             if isHighFidelity == False:
-#                print('Approach 1')
                 if VarType == 'Alti':
-#                    print('Inclination is unknown')
-#                    if e == 0:
-#                        a = Re + var
-#                        T = 2 * math.pi * math.sqrt(a**3/mu)
-#                    else:
-#                        print('Problem not defined yet for non-circular orbits.')
-#                        sys.exit # DOES NOT WORK PROPERLY, LOOP IS NOT BROKEN
                     a = (Re + var)/(1-e)
                     T = 2 * math.pi * math.sqrt(a**3/mu)
                     
@@ -110,30 +89,24 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
                         Nsolutions += 1
                     elif (C2 > 0) & (abs(C2/C1) <=1):
                         DeltaL2 = C2
-                        i = math.acos(DeltaL2/C1) * r2d # for i = [90, 180] deg 
+                        i = math.acos(DeltaL2/C1) * r2d # for i = (90, 180] deg 
                         Result[count,rowCount,4] = i
                         Nsolutions += 1
-                    elif ( C3 < 0) & (abs(C3/C1) <=1): # this was missing in MATLAB script
+                    elif ( C3 < 0) & (abs(C3/C1) <=1): 
                         DeltaL2 = C3
                         i = math.acos(DeltaL2/C1) * r2d # for i = [0, 90] deg 
                         Result[count,rowCount,5] = i   
                         Nsolutions += 1
                     elif (C3>0) & (abs(C3/C1) <=1):
                         DeltaL2 = C3
-                        i = math.acos(DeltaL2/C1) * r2d # for i = [90, 180] deg 
+                        i = math.acos(DeltaL2/C1) * r2d # for i = (90, 180] deg 
                         Result[count,rowCount,5] = i   
                         Nsolutions += 1
                 elif VarType == 'Inclin':
                     print('Function is not defined for low fidelity + unknown inclination case.')
                     return Result
             else:
-#                print('Approach 2')
                 if VarType == 'Alti':
-#                    if e == 0:
-#                        a = Re + var
-#                    else:
-#                        print('Problem not defined yet for non-circular orbits.')
-#                        sys.exit
                     a = (Re + var)/(1-e)    
                     C1 = -2 * k2 * (a**-3.5) * ((1-e**2)**-2) * De*r2d  # RAAN_dot = C1 * cos(i)
                     C2 = k2 * (a**-3.5) *((1-e**2)**-2) * De*r2d # omega_dot = C2 *(5*(cosd(i))^2 -1)
@@ -145,7 +118,7 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
                     B = C1 * j/k
                     C = n - 360 *j/k - (C2 + C3)
                     D = B**2-4*A*C    
-                
+                    
                     if D >=0:
                         if (D == 0) & (abs(-B/(2*A)) <=1):
                             i1 = math.acos(-B/(2*A))
@@ -173,68 +146,28 @@ def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=Fal
                         iterations = iterations+1
            
                         RAAN_dot = - 2 * k2 * math.pow(a0,-3.5) * math.cos(i/r2d) * math.pow(1-e**2,-2) * De * r2d
-                        #       print(RAAN_dot)
                         omega_dot = k2 * math.pow(a0,-3.5) * (5*(math.cos(i/r2d))**2 -1) * math.pow(1-e**2,-2) * De * r2d
-                        #       print(omega_dot)
                         M_dot = k2 * math.pow(a0,-3.5) * (3*(math.cos(i/r2d))**2 -1) * math.pow(1-e**2,-1.5) * De * r2d
-                        #       print(M_dot)
                         n = (j/k) * (L_dot - RAAN_dot) -(omega_dot + M_dot)
-                        #       print(n)
+                        
                         a1 = (mu/(n/(De*r2d))**2)**(1/3)
-                        #       print('a1 is:',a1)
-           
-#                      # print('At iteration:',iterations,' a1 was ',a1, 'a0 was', a0)
+
                         if iterations > 1000:
-#                            print('Maximum number of iterations executed')
                             a0 = a1
                             break
                         elif (abs(a1-a0) < 10**(-10)):  
-#                            print('Convergence reached after ',iterations, 'iterations')    
                             a0 = a1
                             break
                         else:
                             a0 = a1    
                     
-                    # Only tracking the feasible solutions
+                    # Only tracking the feasible solutions i.e. positive altitudes
                     if ((a0 * (1-e)) - Re) > 0:
                         Nsolutions += 1
                         Result[count,rowCount,4] = (a0 * (1-e)) - Re
-                    
+
     # Printing the status of solutions obtained
     if printStatus == True:
         print(Nsolutions, ' solutions are obtained for the Earth-repeat orbits.')
-                                
-            
-#    print(Result.shape)
+
     return Result
-    
-    
-##########################
-######### Executing runs
-##########################
-
-Run = 1 # 1 - Approach 1 with i as unknown
-        # 2 - Approach 2 with i as unknown 
-        # 3 - Approach 2 with altitude as unknown
-
-# Approach 1, i as unknown 
-if Run == 1:
-#    jk = np.matrix('14, 1; 43, 3; 29, 2; 59, 4; 74, 5 ; 15,1')
-    jk = np2.matrix('39, 3; 40, 3; 41, 3; 42, 3; 43,3; 44, 3 ; 45,3; 46, 3; 47,3 ; 48, 3')
-    e = 0.1
-    a = np2.array([200,2000,5])
-    Result = EarthRepeatOrbits(jk,e,a,'Alti',False,True)    
-
-# Approach 2, i as unknown 
-elif Run == 2:
-    jk = np2.matrix('39, 3; 40, 3; 41, 3; 42, 3; 43,3; 44, 3 ; 45,3; 46, 3; 47,3 ; 48, 3')
-    e = 0.1
-    a = np2.array([200,2000,5])
-    Result = EarthRepeatOrbits(jk,e,a,'Alti',True,True)   
-    
-# Approach 2 with altitude as unknown
-elif Run == 3:
-    jk = np2.matrix('14, 1; 43, 3; 29, 2; 59, 4; 74, 5 ; 15,1')
-    e = 0
-    a = np2.array([28,29,1])
-    Result = EarthRepeatOrbits(jk,e,a,'Inclin',True,True)   

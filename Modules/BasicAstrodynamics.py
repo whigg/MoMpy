@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Code by: Palash Patole
-MoMpy Project: Laboratory
+MoMpy Project: Modules
 Date of creation: Fri Nov  8 20:50:04 2019
 
 version: Base
