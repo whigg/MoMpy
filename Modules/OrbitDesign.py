@@ -13,6 +13,8 @@ Culmination of:
 """
 
 def EarthRepeatOrbits(jk,e,Variable,VarType,isHighFidelity=False,printStatus=False):
+    """Find a set of repeating ground track orbits around Earth (Earth-repeat orbits)."""
+   
     # importing the required modules
     import spiceypy as spice
     import math
